@@ -5,7 +5,7 @@ import json
 
 app = Flask(__name__)
 
-API_KEY = "rg_8091bd1a33724e8080251b8cc1c8d209"
+API_KEY = "PASTE YOUR API KEY HERE"
 API_BASE = "https://api.railradar.in/v1"
 
 STATIONS_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "stations.json")
