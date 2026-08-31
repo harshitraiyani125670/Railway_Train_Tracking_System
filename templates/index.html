@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Train Schedule Finder</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+  <div class="board-frame">
+    <header class="station-header">
+      <div class="station-name">
+        <span class="station-name-en">TRAIN SCHEDULE FINDER</span>
+        <span class="station-tag">LIVE RAILRADAR DATA</span>
+      </div>
+      <div class="clock" id="clock">--:--:--</div>
+    </header>
+
+    <nav class="platform-tabs">
+      <button class="tab-btn active" data-tab="search">
+        <span class="tab-index">01</span> SEARCH TRAINS
+      </button>
+      <button class="tab-btn" data-tab="live">
+        <span class="tab-index">02</span> LIVE STATUS
+      </button>
+    </nav>
+
+    <section class="tab-panel active" id="panel-search">
+      <form class="query-form" id="search-form">
+        <div class="field">
+          <label for="from-city">FROM</label>
+          <input type="text" id="from-city" name="from" value="Mumbai" autocomplete="off" list="from-suggestions" required>
+          <datalist id="from-suggestions"></datalist>
+        </div>
+        <div class="field">
+          <label for="to-city">TO</label>
+          <input type="text" id="to-city" name="to" value="Delhi" autocomplete="off" list="to-suggestions" required>
+          <datalist id="to-suggestions"></datalist>
+        </div>
+        <div class="field">
+          <label for="travel-date">DATE <span class="optional">(optional)</span></label>
+          <input type="date" id="travel-date" name="date">
+        </div>
+        <button type="submit" class="go-btn" id="search-btn">SEARCH &rarr;</button>
+      </form>
+
+      <p class="status-line" id="search-status">Enter two cities and press search. Click any train to see its live route.</p>
+
+      <div class="board" id="search-board">
+        <div class="board-row board-head">
+          <span class="col-no">NO</span>
+          <span class="col-train">TRAIN</span>
+          <span class="col-name">NAME</span>
+          <span class="col-time">DEP</span>
+          <span class="col-time">ARR</span>
+          <span class="col-days">DAYS</span>
+        </div>
+        <div class="board-empty" id="search-empty">NO RESULTS YET</div>
+      </div>
+    </section>
+
+    <section class="tab-panel" id="panel-live">
+      <form class="query-form" id="live-form">
+        <div class="field">
+          <label for="train-number">TRAIN NUMBER</label>
+          <input type="text" id="train-number" name="train" value="12951" autocomplete="off" required>
+        </div>
+        <button type="submit" class="go-btn" id="live-btn">TRACK &rarr;</button>
+      </form>
+
+      <p class="status-line" id="live-status">Enter a train number and press track.</p>
+
+      <div class="route-header" id="live-header"></div>
+      <div class="timeline" id="live-timeline">
+        <div class="board-empty">NO TRAIN TRACKED YET</div>
+      </div>
+    </section>
+
+    <section class="tab-panel" id="panel-route">
+      <button class="back-btn" id="route-back-btn">&larr; BACK TO RESULTS</button>
+      <p class="status-line" id="route-status">Loading route...</p>
+      <div class="route-header" id="route-header"></div>
+      <div class="timeline" id="timeline"></div>
+    </section>
+
+    <footer class="board-footer">
+      Data via RailRadar API &middot; for personal / educational use
+    </footer>
+  </div>
+
+<script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>
