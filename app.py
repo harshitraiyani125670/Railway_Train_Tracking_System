@@ -1,31 +1,9 @@
-"""
-app.py - Train Schedule Finder (Flask + HTML/CSS/JS, RailRadar Edition)
-===========================================================================
-Backend: Flask + RailRadar API (https://railradar.in) - documented,
-reliable, key-based.
-Frontend: templates/index.html + static/ (HTML, CSS, vanilla JS).
-
-SETUP:
-1. Sign up for free at https://railradar.in and get an API key
-2. Paste your key into the "API_KEY = ..." line below
-3. pip install -r requirements.txt
-
-RUN:
-    python app.py
-    Then open http://127.0.0.1:5000 in your browser.
-"""
-
 from flask import Flask, jsonify, render_template, request
 import requests
 import os
 import json
 
 app = Flask(__name__)
-
-# ===========================================================================
-# >>> PASTE YOUR API KEY HERE <<<
-# Get a free key from railradar.in/developers (format: rr_live_xxxxxxxx)
-# ===========================================================================
 
 API_KEY = "rg_8091bd1a33724e8080251b8cc1c8d209"
 API_BASE = "https://api.railradar.in/v1"
