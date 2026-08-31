@@ -91,9 +91,6 @@ def city_to_code(name: str) -> str:
     )
 
 
-# ---------------------------------------------------------------------
-# Local station database (stations.json) - built once by fetch_stations.py
-# ---------------------------------------------------------------------
 _local_stations_cache = None  # list of (code, name, name_lower) tuples
 
 
