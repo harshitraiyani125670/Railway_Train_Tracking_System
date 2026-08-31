@@ -8,7 +8,6 @@ app = Flask(__name__)
 API_KEY = "rg_8091bd1a33724e8080251b8cc1c8d209"
 API_BASE = "https://api.railradar.in/v1"
 
-# Local station database file (built once by fetch_stations.py)
 STATIONS_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "stations.json")
 
 
@@ -135,7 +134,6 @@ def search_stations(query: str, limit: int = 10):
         ordered = exact + starts + contains
         return [{"code": c, "name": n} for c, n in ordered[:limit]]
 
-    # No local database yet - fall back to the live API search
     allowed_limits = (5, 10, 20, 50)
     api_limit = min(allowed_limits, key=lambda x: abs(x - limit))
     data = _get("/lookup/search/stations", {"q": query, "limit": api_limit})
