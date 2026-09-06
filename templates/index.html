@@ -66,12 +66,12 @@
       <form class="query-form" id="live-form">
         <div class="field">
           <label for="train-number">TRAIN NUMBER</label>
-          <input type="text" id="train-number" name="train" value="12951" autocomplete="off" required>
+          <input type="text" id="train-number" name="train" autocomplete="off" required>
         </div>
-        <button type="submit" class="go-btn" id="live-btn">TRACK &rarr;</button>
+        <button type="submit" class="go-btn" id="live-btn">SEARCH &rarr;</button>
       </form>
 
-      <p class="status-line" id="live-status">Enter a train number and press track.</p>
+      <p class="status-line" id="live-status">Enter a train number and press SEARCH</p>
 
       <div class="route-header" id="live-header"></div>
       <div class="timeline" id="live-timeline">
@@ -85,11 +85,6 @@
       <div class="route-header" id="route-header"></div>
       <div class="timeline" id="timeline"></div>
     </section>
-
-    <footer class="board-footer">
-      Data via RailRadar API &middot; for personal / educational use
-    </footer>
-  </div>
 
 <script src="{{ url_for('static', filename='js/app.js') }}"></script>
 </body>
