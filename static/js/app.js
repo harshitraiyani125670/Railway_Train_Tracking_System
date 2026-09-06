@@ -33,24 +33,44 @@ function setupStationAutocomplete(inputId, datalistId) {
   const input = document.getElementById(inputId);
   const datalist = document.getElementById(datalistId);
   let debounceTimer = null;
+  let latestRequestId = 0;      // guards against a slow, stale response overwriting a newer one
+  const cache = new Map();      // remembers recent queries so re-typing/backspacing feels instant
 
   input.addEventListener("input", () => {
     clearTimeout(debounceTimer);
     const query = input.value.trim();
-    if (query.length < 2) return;
+    if (query.length < 2) {
+      datalist.innerHTML = "";
+      return;
+    }
 
-    debounceTimer = setTimeout(async () => {
-      try {
-        const resp = await fetch(`/api/stations/search?q=${encodeURIComponent(query)}`);
-        const data = await resp.json();
-        datalist.innerHTML = (data.results || [])
-          .map((s) => `<option value="${escapeHtml(s.name)}">`)
-          .join("");
-      } catch (err) {
-        // Autocomplete failing silently is fine - search still works without it
-      }
-    }, 250);
+    if (cache.has(query)) {
+      renderOptions(cache.get(query));
+      return;
+    }
+
+    // Short debounce - just enough to avoid firing on every single keystroke
+    // while typing fast, without feeling laggy.
+    debounceTimer = setTimeout(() => fetchSuggestions(query), 120);
   });
+
+  function renderOptions(results) {
+    datalist.innerHTML = results.map((s) => `<option value="${escapeHtml(s.name)}">`).join("");
+  }
+
+  async function fetchSuggestions(query) {
+    const requestId = ++latestRequestId;
+    try {
+      const resp = await fetch(`/api/stations/search?q=${encodeURIComponent(query)}`);
+      const data = await resp.json();
+      if (requestId !== latestRequestId) return; // a newer keystroke already superseded this
+      const results = data.results || [];
+      cache.set(query, results);
+      renderOptions(results);
+    } catch (err) {
+      // Autocomplete failing silently is fine - search still works without it
+    }
+  }
 }
 
 setupStationAutocomplete("from-city", "from-suggestions");
@@ -186,15 +206,25 @@ function renderRoute(data, headerEl, timelineEl) {
     return;
   }
 
-  timelineEl.innerHTML = stations.map((s) => {
+  // Find the train's current position: the last station that has already
+  // been reached (color !== "upcoming"). If none have been reached yet,
+  // the train is still at the very first station (source).
+  let currentIndex = 0;
+  for (let i = 0; i < stations.length; i++) {
+    if (stations[i].color !== "upcoming") currentIndex = i;
+  }
+
+  timelineEl.innerHTML = stations.map((s, i) => {
     const statusClass = s.color === "late" ? "tl-status-late" : (s.color === "ontime" ? "tl-status-ontime" : "");
     const times = s.actualArrival || s.actualDeparture
       ? `${escapeHtml(s.actualArrival || "-")} \u2192 ${escapeHtml(s.actualDeparture || "-")}`
       : `${escapeHtml(s.scheduledArrival || "-")} \u2192 ${escapeHtml(s.scheduledDeparture || "-")} (scheduled)`;
+    const isCurrent = i === currentIndex;
 
     return `
-      <div class="tl-station">
-        <span class="tl-dot ${s.color}"></span>
+      <div class="tl-station${isCurrent ? " tl-current" : ""}" ${isCurrent ? 'data-current-marker="true"' : ""}>
+        <span class="tl-dot ${s.color}${isCurrent ? " tl-dot-current" : ""}"></span>
+        ${isCurrent ? '<span class="tl-here-badge">TRAIN IS HERE</span>' : ""}
         <span class="tl-code">${escapeHtml(s.code)}</span>
         <span class="tl-distance">${escapeHtml(s.distance)} km</span>
         <p class="tl-name">${escapeHtml(s.name)}</p>
@@ -202,6 +232,19 @@ function renderRoute(data, headerEl, timelineEl) {
       </div>
     `;
   }).join("");
+
+  // Auto-scroll so the current position is immediately visible, instead of
+  // making the user scroll down from the very first station every time.
+  // Scoped to this specific container (via querySelector, not a global ID)
+  // so the Search-results Route view and the Live Status tab never clash.
+  const marker = timelineEl.querySelector('[data-current-marker="true"]');
+  if (marker) {
+    requestAnimationFrame(() => {
+      setTimeout(() => {
+        marker.scrollIntoView({ behavior: "smooth", block: "center" });
+      }, 60);
+    });
+  }
 }
 
 routeBackBtn.addEventListener("click", () => {
