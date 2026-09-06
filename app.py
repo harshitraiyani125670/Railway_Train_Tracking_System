@@ -151,7 +151,6 @@ def _check_key():
 
 
 def _get(path: str, params: dict = None):
-    """Shared GET helper for the RailRadar API with standard error handling."""
     _check_key()
     headers = {"Authorization": f"Bearer {API_KEY}"}
     try:
@@ -175,7 +174,6 @@ def _get(path: str, params: dict = None):
 
 
 def fetch_trains(from_city: str, to_city: str, date: str = None):
-    """Returns a normalized list of trains running between two cities."""
     from_code = city_to_code(from_city)
     to_code = city_to_code(to_city)
 
@@ -203,7 +201,6 @@ def fetch_trains(from_city: str, to_city: str, date: str = None):
 
 
 def fetch_live_status(train_number: str, date: str = None, halts_only: bool = False):
-    """Returns live status (summary) for a single train."""
     number = train_number.strip()
     if not number.isdigit():
         raise TrainAPIError("Train number should be digits only, e.g. 12951")
@@ -221,11 +218,6 @@ def fetch_live_status(train_number: str, date: str = None, halts_only: bool = Fa
 
 
 def fetch_route(train_number: str, date: str = None):
-    """
-    Returns the station-by-station route for a train, showing only the
-    stops where the train actually halts (pass-through stations are
-    excluded via RailRadar's haltsOnly=true).
-    """
     live = fetch_live_status(train_number, date, halts_only=True)
 
     stations = []
@@ -269,7 +261,6 @@ def fetch_route(train_number: str, date: str = None):
 
 
 def _fmt_time(iso_str):
-    """Extracts just HH:MM from an ISO timestamp like '2026-06-23T01:07:00+05:30'."""
     if not iso_str:
         return None
     try:
@@ -285,8 +276,6 @@ def index():
 
 @app.route("/api/stations/search")
 def api_stations_search():
-    """Autocomplete endpoint: returns up to 10 matching stations
-    (searches RailRadar's full India station database live)."""
     q = request.args.get("q", "").strip()
     if len(q) < 2:
         return jsonify({"results": []})
@@ -301,8 +290,6 @@ def api_stations_search():
 
 @app.route("/api/stations/debug")
 def api_stations_debug():
-    """Debug helper: shows whether stations.json is being used, and runs
-    a test search so you can confirm everything is working."""
     local = _load_local_stations()
     q = request.args.get("q", "delhi")
     try:
