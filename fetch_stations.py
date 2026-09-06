@@ -1,20 +1,7 @@
-"""
-fetch_stations.py - Run this ONCE to build a local database of all Indian
-railway stations (stations.json), so the main app never needs to call the
-API for station lookups.
-
-USAGE:
-    python fetch_stations.py
-
-This uses the same API_KEY you put in app.py. Re-run this occasionally
-(e.g. every few months) if you want to pick up newly added stations.
-"""
-
 import json
 import sys
 import requests
 
-# Reuse the same key you set in app.py
 from app import API_KEY, API_BASE, _check_key
 
 
@@ -40,8 +27,6 @@ def fetch_all_stations():
 
     raw = body["data"]
 
-    # Normalize into a simple list of {code, name} - handles a couple of
-    # possible shapes since this is an unofficial/legacy endpoint format.
     stations = []
     if isinstance(raw, list):
         for entry in raw:
