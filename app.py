@@ -12,7 +12,6 @@ STATIONS_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "statio
 
 
 class TrainAPIError(Exception):
-    """Any API/network related error is raised as this exception."""
     pass
 
 
@@ -65,14 +64,7 @@ CITY_STATION_MAP = {
 }
 
 
-def city_to_code(name: str) -> str:
-    """
-    Converts a city/station name into its station code.
-    Checks the small fast list of major cities first, then searches the
-    local stations.json database (all 10,000+ Indian stations, no API call
-    needed). Falls back to a live API search only if stations.json hasn't
-    been generated yet.
-    """
+def city_to_code(name: str) -> str: 
     key = name.strip().lower()
 
     if key in CITY_STATION_MAP:
@@ -91,12 +83,9 @@ def city_to_code(name: str) -> str:
     )
 
 
-_local_stations_cache = None  # list of (code, name, name_lower) tuples
-
+_local_stations_cache = None  
 
 def _load_local_stations():
-    """Loads stations.json into memory once and keeps it cached for the
-    lifetime of the running app. Returns None if the file doesn't exist."""
     global _local_stations_cache
     if _local_stations_cache is not None:
         return _local_stations_cache
@@ -112,12 +101,6 @@ def _load_local_stations():
 
 
 def search_stations(query: str, limit: int = 10):
-    """
-    Searches for stations matching the query. Uses the local stations.json
-    database if it exists (instant, no API call); otherwise falls back to
-    RailRadar's live search endpoint.
-    Returns a list of {"code": ..., "name": ...} dicts.
-    """
     query = query.strip()
     if len(query) < 2:
         return []
