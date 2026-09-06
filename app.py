@@ -307,20 +307,30 @@ def api_stations_debug():
 
 
 @app.route("/api/trains")
-def api_trains():
-    from_city = request.args.get("from", "").strip()
-    to_city = request.args.get("to", "").strip()
+def api_live(train_number):
     date = request.args.get("date", "").strip() or None
 
-    if not from_city or not to_city:
-        return jsonify({"error": "Both 'from' and 'to' cities are required."}), 400
-
     try:
-        trains = fetch_trains(from_city, to_city, date)
+        data = fetch_live_status(train_number, date)
     except TrainAPIError as e:
         return jsonify({"error": str(e)}), 502
 
-    return jsonify({"from": from_city, "to": to_city, "trains": trains})
+    return jsonify({
+        "TrainNo": data.get("trainNumber"),
+        "TrainName": data.get("trainName"),
+        "LastUpdate": data.get("lastUpdatedAt"),
+        "DelayDep": f"{data.get('delayMinutes', 0)} min" if data.get("delayMinutes") is not None else "-",
+        "CurrentStation": data.get("currentLocation", {}).get("stationCode", "-"),
+        "CurrentStationName": data.get("previousHalt", {}).get("stationName", "-"),
+        "Platform": data.get("currentLocation", {}).get("platform", "-"),
+        "NextStationName": data.get("nextHalt", {}).get("stationName"),
+        "NextStationCode": data.get("nextHalt", {}).get("stationCode"),
+        "exceptions": [
+            {"ExceptionType": e.get("type"), "ExceptionDate": e.get("message")}
+            for e in data.get("exceptions", [])
+        ],
+    })
+
 
 
 @app.route("/api/live/<train_number>")
