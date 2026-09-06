@@ -108,11 +108,23 @@ def search_stations(query: str, limit: int = 10):
     local = _load_local_stations()
     if local is not None:
         q = query.lower()
-        exact = [(c, n) for c, n, nl in local if nl == q]
-        starts = [(c, n) for c, n, nl in local if nl.startswith(q) and nl != q]
-        contains = [(c, n) for c, n, nl in local if q in nl and not nl.startswith(q)]
+        exact, starts, contains = [], [], []
+        for code, name, name_lower in local:
+            if name_lower == q:
+                exact.append((code, name))
+            elif name_lower.startswith(q):
+                starts.append((code, name))
+            elif q in name_lower:
+                contains.append((code, name))
+            
+            if len(exact) + len(starts) >= limit and len(contains) >= limit:
+                break
         ordered = exact + starts + contains
         return [{"code": c, "name": n} for c, n in ordered[:limit]]
+
+    print("[WARNING] stations.json not found - falling back to the live API for "
+          "every autocomplete keystroke, which will feel slow. Run "
+          "'python fetch_stations.py' once to fix this.")
 
     allowed_limits = (5, 10, 20, 50)
     api_limit = min(allowed_limits, key=lambda x: abs(x - limit))
