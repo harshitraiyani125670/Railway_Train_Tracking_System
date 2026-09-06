@@ -353,6 +353,32 @@ body {
 .timeline {
   position: relative;
   padding-left: 26px;
+  max-height: 460px;
+  overflow-y: auto;
+  scroll-behavior: smooth;
+}
+
+/* Dark-themed scrollbar so it matches the board instead of a default white one */
+.timeline {
+  scrollbar-width: thin;               /* Firefox */
+  scrollbar-color: var(--amber-dim) var(--panel);
+}
+
+.timeline::-webkit-scrollbar {
+  width: 8px;
+}
+
+.timeline::-webkit-scrollbar-track {
+  background: var(--panel);
+}
+
+.timeline::-webkit-scrollbar-thumb {
+  background: var(--amber-dim);
+  border-radius: 4px;
+}
+
+.timeline::-webkit-scrollbar-thumb:hover {
+  background: var(--amber);
 }
 
 .timeline::before {
@@ -372,6 +398,13 @@ body {
 
 .tl-station:last-child { padding-bottom: 0; }
 
+.tl-station.tl-current {
+  background: var(--amber-glow);
+  margin-left: -12px;
+  padding: 10px 12px 26px 12px;
+  border: 1px solid var(--amber);
+}
+
 .tl-dot {
   position: absolute;
   left: -26px;
@@ -382,9 +415,37 @@ body {
   background: var(--text-muted);
 }
 
+.tl-station.tl-current .tl-dot { left: -14px; }
+
 .tl-dot.ontime { background: var(--teal); }
 .tl-dot.late { background: var(--red); }
 .tl-dot.upcoming { background: #3a4250; }
+
+.tl-dot-current {
+  width: 16px !important;
+  height: 16px !important;
+  top: -1px !important;
+  box-shadow: 0 0 0 4px var(--amber-glow);
+  animation: tl-pulse 1.6s ease-in-out infinite;
+}
+
+@keyframes tl-pulse {
+  0%, 100% { box-shadow: 0 0 0 4px var(--amber-glow); }
+  50% { box-shadow: 0 0 0 8px var(--amber-glow); }
+}
+
+.tl-here-badge {
+  display: inline-block;
+  background: var(--amber);
+  color: #1a1300;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  padding: 2px 8px;
+  border-radius: 3px;
+  margin-bottom: 4px;
+}
 
 .tl-code {
   font-family: var(--font-mono);
